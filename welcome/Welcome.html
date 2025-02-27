@@ -1,0 +1,100 @@
+{% extends "global/Page.html" %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h2 class="card-title mb-4">Welcome to the OCTAGON!</h2>
+
+        <div class="welcome-text mb-5">
+            <div class="instruction-section">
+                <h3>📝 Study Overview</h3>
+                <p>The Octagon is a study that consists of 8 sequential competitive mini-games.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>⚙️ Game Structure</h3>
+                    <p>Each game has specific instructions and a time limit displayed at the top of the page.</p>
+                    <p>Games end either when completed or when time expires.</p>
+                    <p>All games must be played in sequence and cannot be revisited.</p>
+                    <p>Upcoming games remain hidden until reached.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🎯 Your Objective</h3>
+                <p>Maximize your score in each game through accurate and focused performance.</p>
+                <p>To ensure the validity of the study please stay engaged. If you stay inactive for too long, you will not be able to continue, and your participation may not count.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>📜 Ranking & Results</h3>
+                <p>Each game is a competition against other participants. Your performance in each game determines your ranking.</p>
+                <p>At the end of each game, scores are recorded, and participants are ranked based on performance.</p>
+                <p><b>Final Results:</b> Your overall ranking will be communicated one week after your participation.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>💰 Payment</h3>
+                <p>You will receive <b>&pound;2</b> for entering the games, and additional pay based on your performance in the games.</p>
+                <p>At the end of the study, one game will be randomly selected. If you scored in the <b>top 10%</b> of participants in that game, you will receive an additional <b>£3</b>. This means that high performance in multiple games can significantly increase your earnings!</p>
+                <p>The exact amount will be communicated one week after the end of the games.</p>
+            </div>
+
+            {% if show_quit_info %}
+                <div class="instruction-section">
+                    <h3>⚠️ Important Notice</h3>
+                    <p>After completing the 4th game, you will have the option to end your participation early.</p>
+                    <p>You will receive performance based payment for any games you have achieved the top 10% until the game you decide to exit.</p>
+                </div>
+            {% endif %}
+
+        <div class="instruction-section">
+                <h3>🕐 TIMING NOTICE</h3>
+                <p>Some games begin automatically upon loading, while other games start upon your first interaction with the game interface. Make sure to keep an eye on that timer!</p>
+        </div>
+        </div>
+        <form method="post">
+            <button class="btn btn-primary btn-lg start-button" type="submit">
+                Let the Games begin !!
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 600px;
+        margin: 50px auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+        color: #2c3e50;
+        font-size: 2.5em;
+    }
+
+    .welcome-text {
+        font-size: 1.2em;
+        line-height: 1.6;
+        color: #34495e;
+    }
+
+    .welcome-text p {
+        margin-bottom: 15px;
+    }
+
+    .start-button {
+        padding: 15px 50px;
+        font-size: 1.3em;
+        background-color: #3498db;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .start-button:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}

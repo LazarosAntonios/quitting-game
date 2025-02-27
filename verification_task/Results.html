@@ -1,0 +1,79 @@
+{% extends "global/Page.html" %}
+{% block title %}Verification Challenge - Results{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h3 class="mb-4">Challenge Complete!</h3>
+
+        <div class="result-box">
+            <div class="result-label">Your Performance</div>
+            <div class="result-value">
+                {{ correct_count }} out of {{ total_rounds }} grids correctly completed
+            </div>
+            <div class="completion-time">
+                Completed in {{ completion_time }} seconds
+            </div>
+        </div>
+
+        {% if show_quit_option %}
+        <div class="quit-section mt-4">
+            <h4>⚠️ <strong> Important Notice </strong></h4>
+            <p>If you wish, you have the option to end your participation now.
+            You will still receive payment for the rounds you have completed so far.</p>
+            <button id="quit-button" class="btn btn-warning">Quit Now</button>
+        </div>
+        {% endif %}
+
+        <div class="mt-4">
+            {% next_button %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 600px;
+        margin: 50px auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .result-box {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .result-label {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .result-value {
+        font-size: 3em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .completion-time {
+        margin-top: 15px;
+        color: #666;
+        font-size: 1.1em;
+    }
+</style>
+
+{% if show_quit_option %}
+<script>
+    document.getElementById('quit-button').addEventListener('click', function() {
+        liveSend({ action: 'quit' }).then(response => {
+            if (response[Object.keys(response)[0]].quit_status === 'success') {
+                window.location.href = "/End/";
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

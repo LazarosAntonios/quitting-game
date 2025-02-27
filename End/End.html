@@ -1,0 +1,41 @@
+{% extends "global/Page.html" %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h2 class="mb-4">🎉 Congratulations!</h2>
+        
+        <div class="completion-message">
+            {% if quit_early %}
+                <p class="lead mb-4">You chose to exit the study early.</p>
+                <p class="lead mb-4">You will get notified for the results of the games in a week.</p>
+                <p class="lead mb-4">If you have scored in the top 10% of the tasks you played until the quitting point, you will get notified regarding pay.</p>
+                <p>Thank you for your time and effort!</p>
+
+            {% else %}
+                <p class="lead mb-4">You have completed all tasks in this study.</p>
+                <p class="lead mb-4">You will get notified for the results of the games in a week.</p>
+                <p class="lead mb-4">If you have scored in the top 10% of the tasks you will get notified regarding pay.</p>
+                <p>Thank you for your time and effort! You have been most valuable.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 600px;
+        margin: 50px auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .completion-message {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+</style>
+{% endblock %}

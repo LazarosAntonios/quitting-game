@@ -1,0 +1,151 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Grid Counting Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li><strong>The timer has already started!</strong></li>
+                    <li>Click on each zero (0) in the grid to count them</li>
+                    <li>Clicked zeros will be highlighted</li>
+                    <li>The counter below will track your clicks</li>
+                    <li>You have <strong>3 minutes</strong> to complete this task</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timer-container text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Time Remaining:</span>
+                <span class="stat-value" id="timer">3:00</span>
+            </div>
+        </div>
+
+        <div class="count-display text-center mb-3">
+            <span class="count-label">Zeros counted:</span>
+            <span id="clickCount" class="count-value">0</span>
+        </div>
+
+        <div class="grid-container mb-4">
+            <table class="grid-table">
+                {% for row in grid %}
+                <tr>
+                    {% for cell in row %}
+                    <td class="grid-cell" data-value="{{ cell }}">{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <form method="post">
+            <input type="hidden" name="count_answer" id="countInput">
+            <input type="hidden" name="completion_time" id="completionTime">
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Count</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .grid-container {
+        overflow-x: auto;
+        max-width: 100%;
+    }
+
+    .grid-table {
+        border-collapse: collapse;
+        margin: 0 auto;
+    }
+
+    .grid-cell {
+        width: 35px;
+        height: 35px;
+        border: 1px solid #ccc;
+        text-align: center;
+        font-family: monospace;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .grid-cell[data-value="0"] {
+        background-color: #f8f9fa;
+    }
+
+    .grid-cell.clicked {
+        background-color: #d4edda !important;
+        color: #155724;
+    }
+
+    .count-display {
+        font-size: 1.3em;
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 10px;
+        z-index: 100;
+    }
+</style>
+
+<script>
+    let clickCount = 0;
+    let startTime = Date.now();
+    const countDisplay = document.getElementById('clickCount');
+    const countInput = document.getElementById('countInput');
+    const completionTimeInput = document.getElementById('completionTime');
+
+    document.querySelectorAll('.grid-cell[data-value="0"]').forEach(cell => {
+        cell.addEventListener('click', function() {
+            if (!this.classList.contains('clicked')) {
+                this.classList.add('clicked');
+                clickCount++;
+            } else {
+                this.classList.remove('clicked');
+                clickCount--;
+            }
+            countDisplay.textContent = clickCount;
+            countInput.value = clickCount;
+        });
+    });
+
+    document.querySelector('form').addEventListener('submit', function() {
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+        completionTimeInput.value = timeSpent;
+    });
+
+    function startTimer(duration) {
+        let timer = duration;
+        const display = document.getElementById('timer');
+
+        const countdown = setInterval(function () {
+            const minutes = parseInt(timer / 60, 10);
+            const seconds = parseInt(timer % 60, 10);
+
+            display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdown);
+                document.querySelector("form").submit();
+            }
+        }, 1000);
+    }
+
+    startTimer({{ time_limit_seconds }});
+</script>
+{% endblock %}

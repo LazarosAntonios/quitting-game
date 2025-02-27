@@ -1,0 +1,249 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Slider Challenge{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Instructions Section -->
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Slider Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li>You will see <strong>48 sliders</strong> positioned at random values</li>
+                    <li>Set as many sliders as possible to exactly <strong>{{ target_value }}</strong></li>
+                    <li>You have <strong>2 minutes</strong> to complete this task</li>
+                    <li>Each correctly positioned slider counts as one point</li>
+                    <li>You can submit your answers at any time using the button below</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Timer and Score -->
+        <div class="stats-container mb-4">
+            <div class="stat-box">
+                <div class="stat-label">Time Remaining</div>
+                <div class="stat-value" id="timer">1:00</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Correct Sliders</div>
+                <div class="stat-value" id="correct-count">0</div>
+            </div>
+        </div>
+
+        <!-- Sliders Container -->
+        <div class="sliders-container">
+            {% for position in random_positions %}
+            <div class="slider-unit">
+                <input type="range"
+                       min="0"
+                       max="100"
+                       value="{{ position }}"
+                       class="form-range slider"
+                       id="slider{{ forloop.counter }}">
+                <span class="value-display">{{ position }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form id="form" method="post">
+            <input type="hidden" name="correct_sliders" id="correct_sliders" value="0">
+            <input type="hidden" name="completion_time" id="completion_time" value="0">
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Results</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 1000px;
+        margin: 0 auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 0;
+    }
+
+    .alert-info ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .alert-info li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .alert-info li:before {
+        content: "•";
+        color: #3498db;
+        position: absolute;
+        left: 0;
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin: 20px 0;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        min-width: 150px;
+        text-align: center;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        color: #666;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .sliders-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .slider-unit {
+        padding: 10px;
+        background: white;
+        border: 1px solid #e1e1e1;
+        border-radius: 8px;
+        transition: transform 0.2s ease;
+    }
+
+    .slider-unit:hover {
+        transform: scale(1.02);
+    }
+
+    .value-display {
+        display: inline-block;
+        min-width: 40px;
+        text-align: center;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-top: 5px;
+    }
+
+    .form-range {
+        width: 100%;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+
+    /* Customize the slider appearance */
+    input[type="range"] {
+        -webkit-appearance: none;
+        height: 8px;
+        background: #dfe6e9;
+        border-radius: 4px;
+        outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #3498db;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background .15s ease-in-out;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+        background: #2980b9;
+    }
+</style>
+
+<script>
+    let startTime = new Date().getTime();
+    const targetValue = {{ target_value }};
+    const sliders = document.querySelectorAll('.slider');
+    const displays = document.querySelectorAll('.value-display');
+    const correctCountDisplay = document.getElementById('correct-count');
+
+    sliders.forEach((slider, index) => {
+        slider.addEventListener('input', function() {
+            displays[index].textContent = this.value;
+            updateCorrectCount();
+        });
+    });
+
+    function updateCorrectCount() {
+        const correct = Array.from(sliders).filter(slider =>
+            parseInt(slider.value) === targetValue
+        ).length;
+        document.getElementById('correct_sliders').value = correct;
+        correctCountDisplay.textContent = correct;
+    }
+
+    document.getElementById('form').addEventListener('submit', function() {
+    const endTime = new Date().getTime();
+    let elapsedTime = Math.round((endTime - startTime) / 1000);
+    let correctSliders = parseInt(document.getElementById('correct_sliders').value) || 0;
+
+    document.getElementById('completion_time').value = elapsedTime;
+    document.getElementById('correct_sliders').value = correctSliders;
+});
+
+    function updateTimer(duration) {
+        const timerDisplay = document.getElementById('timer');
+        let timeLeft = duration;
+
+        const timer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (--timeLeft < 0) {
+                clearInterval(timer);
+                document.getElementById('form').submit();
+            }
+        }, 1000);
+    }
+
+    updateTimer({{ timeout_seconds }});
+</script>
+{% endblock %}

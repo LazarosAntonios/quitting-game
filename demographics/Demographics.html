@@ -1,0 +1,123 @@
+{% extends "global/Page.html" %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="intro-message alert alert-info mb-4">
+            <h4 class="text-center mb-3">Before We Begin...</h4>
+            <p>We'll now ask you some general questions about yourself. Please try to be as precise as possible in your answers. Remember, there are no wrong answers - we're simply interested in learning more about our participants.</p>
+        </div>
+
+        <div class="mb-4">
+            <h3 class="text-center">Participant Information</h3>
+            <p class="text-muted text-center">Please answer the following questions about yourself. This information will be kept confidential and used only for research purposes.</p>
+        </div>
+
+        <form method="post">
+            {% for field in form %}
+                <div class="form-group mb-4">
+                    <label class="form-label">
+                        {{ field.label }}
+                    </label>
+
+                    {% if field.name == "age" %}
+                        <input type="number"
+                               name="{{ field.name }}"
+                               class="form-control"
+                               min="18"
+                               max="100"
+                               required>
+                    {% elif field.name == "prior_experiments" %}
+                        <input type="number"
+                               name="{{ field.name }}"
+                               class="form-control"
+                               min="0"
+                               required>
+                    {% else %}
+                        <div class="form-control">
+                            {{ field }}
+                        </div>
+                    {% endif %}
+
+                    {% if field.errors %}
+                        <div class="alert alert-danger mt-1">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="text-center mt-5">
+                <button class="btn btn-primary btn-lg" type="submit">Continue</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: 2rem auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .intro-message {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    select.form-control {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+
+    /* Style the select elements */
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: white;
+    }
+
+    /* Style radio buttons and checkboxes container */
+    .form-check {
+        margin: 0.5rem 0;
+    }
+
+    /* Add spacing between radio options */
+    .form-check + .form-check {
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}

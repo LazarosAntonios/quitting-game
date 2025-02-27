@@ -1,0 +1,58 @@
+{% extends "global/Page.html" %}
+{% block title %}Slider Challenge - Complete{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body text-center">
+        <h3 class="mb-4">Challenge Complete!</h3>
+
+        <div class="result-box">
+            <div class="result-label">Your Performance</div>
+            <div class="result-value">
+                {{ correct_sliders }} out of {{ total_sliders }} sliders
+            </div>
+            <div class="result-details">
+                correctly positioned at {{ target_value }}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            {{ next_button }}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 600px;
+        margin: 50px auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .result-box {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .result-label {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .result-value {
+        font-size: 3em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .result-details {
+        margin-top: 15px;
+        color: #666;
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}

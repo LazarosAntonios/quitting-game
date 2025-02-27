@@ -1,0 +1,193 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Trivia Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li>You have <strong>8 minutes</strong> to answer all questions</li>
+                    <li>Questions include multiple choice and true/false</li>
+                    <li>You can submit your answers at any time using the button at the bottom</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timer-container text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Time Remaining:</span>
+                <span class="stat-value" id="timer">8:00</span>
+            </div>
+        </div>
+
+        <form method="post">
+            <input type="hidden" name="answers_json" id="answers_json" value="{}">
+
+            {% for question in questions %}
+            <div class="question-container mb-4">
+                <div class="question-header">
+                    Question {{ forloop.counter }} of 12
+                </div>
+                <div class="question-text">
+                    {{ question.question }}
+                </div>
+                <div class="options-container">
+                    {% for choice in question.choices %}
+                    <div class="option">
+                        <label>
+                            <input type="radio"
+                                   name="question_{{ question.question }}"
+                                   value="{{ choice }}"
+                                   onclick="recordAnswer('{{ question.question }}','{{ choice }}')"
+                            >
+                            {{ choice }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                {% next_button %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: 0 auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 0;
+    }
+
+    .alert-info ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .alert-info li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .alert-info li:before {
+        content: "•";
+        color: #3498db;
+        position: absolute;
+        left: 0;
+    }
+
+    .timer-container {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 10px;
+        z-index: 100;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0 10px;
+    }
+
+    .question-container {
+        background: #fff;
+        border: 1px solid #e1e1e1;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .question-header {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+
+    .question-text {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .option {
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+        margin-bottom: 5px;
+    }
+
+    .option:hover {
+        background: #e9ecef;
+    }
+
+    .option label {
+        display: block;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+        margin-right: 10px;
+    }
+</style>
+
+<script>
+    let answersObj = {};
+
+    function recordAnswer(questionText, chosenOption) {
+        answersObj[questionText] = chosenOption;
+        document.getElementById("answers_json").value = JSON.stringify(answersObj);
+    }
+
+    function startTimer(duration) {
+        let timer = duration;
+        const display = document.getElementById('timer');
+
+        const countdown = setInterval(function () {
+            const minutes = parseInt(timer / 60, 10);
+            const seconds = parseInt(timer % 60, 10);
+
+            display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdown);
+                document.querySelector("form").submit();
+            }
+        }, 1000);
+    }
+
+    startTimer(8 * 60);
+</script>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends "global/Page.html" %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Instructions Section -->
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Color Sorting Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li>Sort the colored blocks by dragging them into their matching colored zones</li>
+                    <li>You have <strong>2 minutes</strong> to sort as many blocks as possible</li>
+                    <li>Each block placed in its correct color zone counts as one point</li>
+                    <li>You can submit your answers at any time using the button below</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-container text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Time Remaining:</span>
+                <span class="stat-value" id="timer">2:00</span>
+            </div>
+        </div>
+
+        <!-- Color Blocks Container -->
+        <div class="color-blocks-section">
+            <h5 class="section-title">Available Blocks</h5>
+            <div id="color-container">
+                {% for color in shuffled_colors %}
+                <div class="color-block" draggable="true" data-color="{{ color }}">{{ color }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Sorting Areas -->
+        <div class="sorting-section mt-4">
+            <h5 class="section-title">Drop Zones</h5>
+            <div id="sorting-areas">
+                {% for color in unique_colors %}
+                <div class="sorting-area" data-color="{{ color }}">
+                    <h3>{{ color }}</h3>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form method="post" id="sorting-form" style="text-align: center;">
+    <input type="hidden" name="sorted_colors" id="sorted_colors" value="[]">
+    <input type="hidden" name="completion_time" id="completion_time" value="0">
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">End Challenge & See Results</button>
+    </div>
+</form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 900px;
+        margin: 0 auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 0;
+    }
+
+    .alert-info ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .alert-info li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .alert-info li:before {
+        content: "•";
+        color: #3498db;
+        position: absolute;
+        left: 0;
+    }
+
+    .timer-container {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 10px;
+        z-index: 100;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0 10px;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-left: 10px;
+        border-left: 4px solid #3498db;
+    }
+
+    #color-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .color-block {
+        width: 100px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+        border: none;
+        border-radius: 8px;
+        cursor: grab;
+        color: white;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+        transition: transform 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .color-block:hover {
+        transform: scale(1.05);
+    }
+
+    #sorting-areas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .sorting-area {
+        min-height: 250px;
+        border: 2px dashed #bdc3c7;
+        border-radius: 10px;
+        text-align: center;
+        padding: 15px;
+        transition: border-color 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .sorting-area:hover {
+        border-color: #3498db;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+    let draggedBlock = null;
+    let timerStarted = false;
+    let timer;
+    const startTime = new Date().getTime();
+
+    const colorBlocks = document.querySelectorAll('.color-block');
+    const sortingAreas = document.querySelectorAll('.sorting-area');
+    const sortedColorsInput = document.getElementById('sorted_colors');
+    const completionTimeInput = document.getElementById('completion_time');
+    const timerDisplay = document.getElementById('timer');
+
+    // Initialize sorted_colors with empty array
+    sortedColorsInput.value = JSON.stringify([]);
+
+    // Initially show full time
+    timerDisplay.textContent = "2:00";
+
+    colorBlocks.forEach(block => {
+        block.addEventListener('dragstart', () => {
+            draggedBlock = block;
+            // Start timer on first drag if not already started
+            if (!timerStarted) {
+                startTimer({{ timeout_seconds }});
+                timerStarted = true;
+            }
+        });
+
+        block.addEventListener('dragend', () => {
+            draggedBlock = null;
+        });
+    });
+
+    sortingAreas.forEach(area => {
+        area.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        area.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (draggedBlock) {
+                area.appendChild(draggedBlock);
+                updateSortedColors();
+            }
+        });
+    });
+
+    function updateSortedColors() {
+    const sortedColors = [];
+    sortingAreas.forEach(area => {
+        const blocks = area.querySelectorAll('.color-block');
+        const targetArea = area.dataset.color;
+        blocks.forEach(block => {
+            sortedColors.push({
+                color: block.dataset.color,
+                targetArea: targetArea
+            });
+        });
+    });
+    // Convert to string and make sure to update the hidden input
+    sortedColorsInput.value = JSON.stringify(sortedColors);
+
+    // Log for debugging
+    console.log('Sorted colors:', sortedColors);
+}
+
+// Update form submission to ensure colors are counted
+document.getElementById('sorting-form').addEventListener('submit', (e) => {
+    if (timer) {
+        clearInterval(timer);
+    }
+    const endTime = new Date().getTime();
+    completionTimeInput.value = Math.round((endTime - startTime) / 1000);
+
+    // Make sure to update sorted colors before submitting
+    updateSortedColors();
+});
+
+    function startTimer(duration) {
+        let timeLeft = duration;
+
+        timer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (--timeLeft < 0) {
+                clearInterval(timer);
+                document.getElementById('sorting-form').submit();
+            }
+        }, 1000);
+    }
+</script>
+{% endblock %}

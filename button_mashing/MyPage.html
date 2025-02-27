@@ -1,0 +1,243 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Instructions Section -->
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Button Mashing Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li>You have <strong>30 seconds</strong> to click the button <strong>EXACTLY</strong> 151 times.</li>
+                    <li>The timer starts after your first click</li>
+                    <li>Try to be as precise as possible with your clicks!</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Game Statistics Display -->
+        <div class="game-container text-center">
+            <div class="stats-container mb-4">
+                <div class="stat-box">
+                    <span class="stat-label">Time Remaining:</span>
+                    <span class="stat-value" id="time-remaining">30</span>
+                    <span class="stat-unit">seconds</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Clicks:</span>
+                    <span class="stat-value" id="press-count">0</span>
+                </div>
+            </div>
+
+            <button id="mash-button" type="button" class="click-button">
+                CLICK ME!
+            </button>
+        </div>
+
+        <form id="game-form" method="post" style="display: none;">
+            <input type="hidden" name="button_press_count" id="final-count">
+            <input type="hidden" name="completion_time" id="final-time">
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: 0 auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 0;
+    }
+
+    .alert-info ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .alert-info li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .alert-info li:before {
+        content: "•";
+        color: #3498db;
+        position: absolute;
+        left: 0;
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        min-width: 150px;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        color: #666;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #2c3e50;
+        display: block;
+    }
+
+    .stat-unit {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .click-button {
+        padding: 30px 60px;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: white;
+        background-color: #3498db;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .click-button:hover {
+        background-color: #2980b9;
+        transform: scale(1.02);
+    }
+
+    .click-button:active {
+        transform: scale(0.98);
+    }
+
+    .click-button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .click-button.success {
+        background-color: #27ae60;
+    }
+
+    .click-button.failure {
+        background-color: #e74c3c;
+    }
+</style>
+
+<script>
+    let pressCount = 0;
+    let timerStarted = false;
+    const timeLimit = 30;
+    let timeRemaining = timeLimit;
+    let startTime;
+    let timerInterval;
+
+    const button = document.getElementById("mash-button");
+    const pressCountDisplay = document.getElementById("press-count");
+    const timeRemainingDisplay = document.getElementById("time-remaining");
+
+    button.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (!timerStarted) {
+        timerStarted = true;
+        startTime = Date.now();
+        startTimer();
+    }
+
+    pressCount++;
+    pressCountDisplay.textContent = pressCount;
+    liveSend({ type: "button_press" });
+
+    if (pressCount >= 151) {  // ✅ If 151 clicks reached
+        clearInterval(timerInterval);  // ✅ Stop timer
+        button.disabled = true;  // ✅ Disable button
+        button.textContent = "Task Completed!";  // ✅ Update UI
+
+        // ✅ Store time spent
+        const actualTime = timeLimit - timeRemaining;
+
+        // ✅ Auto-submit form
+        const form = document.createElement('form');
+        form.method = 'post';
+
+        const countInput = document.createElement('input');
+        countInput.type = 'hidden';
+        countInput.name = 'button_press_count';
+        countInput.value = pressCount;
+        form.appendChild(countInput);
+
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'completion_time';
+        timeInput.value = actualTime;
+        form.appendChild(timeInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+});
+
+    function startTimer() {
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        timeRemainingDisplay.textContent = timeRemaining;
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            button.disabled = true;
+            button.textContent = "Time's Up!";
+
+            // Calculate actual time spent
+            const actualTime = 30 - timeRemaining;  // This gives actual seconds spent
+
+            const form = document.createElement('form');
+            form.method = 'post';
+
+            const countInput = document.createElement('input');
+            countInput.type = 'hidden';
+            countInput.name = 'button_press_count';
+            countInput.value = pressCount;
+            form.appendChild(countInput);
+
+            const timeInput = document.createElement('input');
+            timeInput.type = 'hidden';
+            timeInput.name = 'completion_time';
+            timeInput.value = actualTime;  // Use actual time instead of total time
+            form.appendChild(timeInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }, 1000);
+}
+</script>
+{% endblock %}

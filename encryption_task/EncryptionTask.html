@@ -1,0 +1,145 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Word Encryption Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li><strong>The timer has already started!</strong></li>
+                    <li>Convert letters to numbers (A=1, B=2, C=3, etc.)</li>
+                    <li>Use 2 digits for each letter (01 for A, 02 for B, etc.)</li>
+                    <li>Example: CAT → 030120</li>
+                    <li>You have <strong>3 minutes</strong> to encrypt all words</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="timer text-center mb-4">
+            Time Remaining: <span id="timer">3:00</span>
+        </div>
+
+        <form id="form" method="post">
+            {% for word, solution in words %}
+            <div class="word-section mb-4">
+                <div class="word-display">{{ word }}</div>
+                <input type="text"
+                       class="encryption-input"
+                       placeholder="Enter encrypted number"
+                       pattern="[0-9]*"
+                       maxlength="12"
+                       data-solution="{{ solution }}"
+                       required>
+                <div class="feedback"></div>
+            </div>
+            {% endfor %}
+
+            <input type="hidden" name="answers" id="answers">
+            <input type="hidden" name="completion_time" id="completion_time">
+
+            <div class="text-center">
+                <button type="submit" class="submit-btn">Submit Answers</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .word-section {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .word-display {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+    }
+
+    .encryption-input {
+        width: 200px;
+        padding: 10px;
+        text-align: center;
+        font-size: 1.2rem;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        transition: border-color 0.3s ease;
+    }
+
+    .encryption-input:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+    .submit-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background: #2980b9;
+        transform: scale(1.05);
+    }
+
+    .timer {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+</style>
+
+<script>
+    let startTime = Date.now();
+
+    function startTimer(duration) {
+        let timer = duration;
+        const display = document.getElementById('timer');
+
+        const countdown = setInterval(function () {
+            const minutes = parseInt(timer / 60, 10);
+            const seconds = parseInt(timer % 60, 10);
+
+            display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdown);
+                document.querySelector("form").submit();
+            }
+        }, 1000);
+    }
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const inputs = document.querySelectorAll('.encryption-input');
+        const answers = Array.from(inputs).map(input => input.value).join(',');
+        document.getElementById('answers').value = answers;
+
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('completion_time').value = timeSpent;
+    });
+
+    startTimer({{ timeout_seconds }});
+</script>
+{% endblock %}

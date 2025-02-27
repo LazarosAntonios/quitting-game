@@ -1,0 +1,176 @@
+{% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Instructions Section -->
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Number Typing Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li><strong>The timer has already started!</strong></li>
+                    <li>Arrange the numbers in <strong>descending order</strong> (highest to lowest)</li>
+                    <li>You have <strong>3 minutes</strong> to complete this task</li>
+                    <li>Separate each number with a comma</li>
+                    <li>Example format: 29,28,27,26,...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-container text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Time Remaining:</span>
+                <span class="stat-value" id="timer">3:00</span>
+            </div>
+        </div>
+
+        <!-- Numbers Display -->
+        <div class="numbers-display mb-4">
+            <div class="numbers-label">Numbers to arrange:</div>
+            <div class="numbers-content">
+                {{ shuffled_numbers }}
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <form method="post">
+            <div class="form-group">
+                <textarea
+                    name="sorted_numbers"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Enter numbers separated by commas, e.g., 29,28,27,..."
+                    required
+                ></textarea>
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Answer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: 0 auto;
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        border-radius: 0;
+    }
+
+    .alert-info ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .alert-info li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .alert-info li:before {
+        content: "•";
+        color: #3498db;
+        position: absolute;
+        left: 0;
+    }
+
+    .timer-container {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 10px;
+        z-index: 100;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0 10px;
+    }
+
+    .numbers-display {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .numbers-label {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+
+    .numbers-content {
+        font-family: monospace;
+        font-size: 1.2em;
+        word-wrap: break-word;
+    }
+
+    textarea.form-control {
+        font-family: monospace;
+        font-size: 1.1em;
+        padding: 15px;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+    function startTimer(duration) {
+        let timer = duration;
+        const display = document.getElementById('timer');
+
+        const countdown = setInterval(function () {
+            const minutes = parseInt(timer / 60, 10);
+            const seconds = parseInt(timer % 60, 10);
+
+            display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdown);
+                document.querySelector("form").submit();
+            }
+        }, 1000);
+    }
+
+    // Start timer when page loads
+    startTimer({{ time_limit_seconds }});
+</script>
+{% endblock %}

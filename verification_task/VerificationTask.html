@@ -1,0 +1,238 @@
+{% extends "global/Page.html" %}
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Instructions Section -->
+        <div class="instructions-section mb-4">
+            <h3 class="text-center mb-3">Verification Challenge</h3>
+            <div class="alert alert-info">
+                <h5>Instructions:</h5>
+                <ul class="mb-0">
+                    <li>You will see <strong>5 different grids</strong> of numbers</li>
+                    <li>For each grid, follow the specific instructions given</li>
+                    <li>Click the squares that match the criteria</li>
+                    <li>You have <strong>2 minutes</strong> to complete all grids</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="timer-container text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Time Remaining:</span>
+                <span class="stat-value" id="timer">2:00</span>
+            </div>
+        </div>
+
+        <!-- Progress Display -->
+        <div class="progress-display text-center mb-4">
+            <div class="stat-box">
+                <span class="stat-label">Grid</span>
+                <span class="stat-value"><span id="current-round">1</span> of 5</span>
+            </div>
+        </div>
+
+        <!-- Challenge Prompt -->
+        <div class="challenge-prompt alert alert-primary mb-4" id="current-prompt">
+            Click to start the first challenge
+        </div>
+
+        <!-- Grid Container -->
+        <div class="grid-container mb-4">
+            <div class="verification-grid" id="grid">
+                <!-- Grid will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Next Button -->
+        <div class="text-center mb-4">
+            <button id="next-grid" class="btn btn-primary" disabled>
+                Verify and Continue
+            </button>
+        </div>
+
+        <form id="completion-form" method="post" style="display: none;">
+            <input type="hidden" name="responses" id="responses">
+            <input type="hidden" name="completion_time" id="completion_time">
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: 30px auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .verification-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .grid-square {
+        aspect-ratio: 1;
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .grid-square:hover {
+        border-color: #3498db;
+        transform: scale(1.02);
+    }
+
+    .grid-square.selected {
+        background: #3498db;
+        color: white;
+        border-color: #2980b9;
+    }
+
+    .challenge-prompt {
+        font-size: 1.2rem;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+
+    .btn-primary:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        color: #666;
+        margin-right: 10px;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+</style>
+
+<script>
+    let currentRound = 0;
+    let startTime = Date.now();
+    let challenges = JSON.parse('{{ verification_challenges|safe }}');  // Parse the JSON string
+    let selectedSquares = new Set();
+
+    function initializeGrid() {
+        currentRound++;
+        document.getElementById('current-round').textContent = currentRound;
+        selectedSquares.clear();
+
+        const challenge = challenges[currentRound - 1];
+        document.getElementById('current-prompt').textContent = challenge.prompt;
+
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+
+        challenge.grid.forEach((num, index) => {
+            const square = document.createElement('div');
+            square.className = 'grid-square';
+            square.dataset.index = index;
+            square.textContent = num;
+            square.onclick = () => toggleSquare(square);
+            grid.appendChild(square);
+        });
+
+        document.getElementById('next-grid').disabled = false;
+    }
+
+    function toggleSquare(square) {
+        const index = parseInt(square.dataset.index);
+        if (selectedSquares.has(index)) {
+            selectedSquares.delete(index);
+            square.classList.remove('selected');
+        } else {
+            selectedSquares.add(index);
+            square.classList.add('selected');
+        }
+    }
+
+    let allResponses = [];  // Array to store all round responses
+
+document.getElementById('next-grid').addEventListener('click', () => {
+    const responseData = {
+        round: currentRound,
+        selected: Array.from(selectedSquares),
+        correct: challenges[currentRound - 1].correct
+    };
+
+    allResponses.push(responseData);  // Store this round's response
+
+    if (currentRound < 5) {
+        initializeGrid();
+    } else {
+        // Submit all responses at once
+        document.getElementById('responses').value = JSON.stringify(allResponses);
+        document.getElementById('completion_time').value =
+            Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('completion-form').submit();
+    }
+});
+
+    let globalTimer = null;  // Store timer reference
+
+function startTimer(duration) {
+    if (globalTimer) {  // If timer exists, don't create a new one
+        return;
+    }
+
+    let timer = duration;
+    const display = document.getElementById('timer');
+
+    globalTimer = setInterval(() => {
+        const minutes = parseInt(timer / 60, 10);
+        const seconds = parseInt(timer % 60, 10);
+
+        display.textContent =
+            minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+        if (--timer < 0) {
+            clearInterval(globalTimer);
+            document.getElementById('completion-form').submit();
+        }
+    }, 1000);
+}
+
+    // Initialize first grid when page loads
+    initializeGrid();
+    startTimer({{ timeout_seconds }});
+</script>
+{% endblock %}
