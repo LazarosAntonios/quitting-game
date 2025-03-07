@@ -1,4 +1,5 @@
 from otree.api import *
+import time
 
 class Constants(BaseConstants):
     name_in_url = 'button_mashing'
@@ -17,6 +18,7 @@ class Player(BasePlayer):
     button_press_count = models.IntegerField(initial=0)
     completion_time = models.IntegerField(initial=0)
     quit_early = models.BooleanField(initial=False)  # ✅ Track quitting
+    start_time = models.FloatField(initial=0)  # ✅ Track start time
 
 class ButtonMashingTask(Page):
     template_name = 'button_mashing/MyPage.html'
@@ -63,10 +65,13 @@ class ButtonMashingTask(Page):
             return {player.id_in_group: {'quit_status': 'success'}}  # ✅ Notify front-end
 
         if data['type'] == 'button_press':  # ✅ Handle button presses
+            if player.button_press_count == 0:  # ✅ Capture start time on first click
+                player.start_time = time.time()
+
             player.button_press_count += 1
 
             if player.button_press_count >= Constants.target_clicks:  # ✅ Auto-end if clicks reached
-                player.completion_time = Constants.time_limit_seconds  # ✅ Store completion time
+                player.completion_time = int(time.time() - player.start_time)  # ✅ Calculate actual completion time
                 player.participant._index_in_pages += 1  # ✅ Move to next page
                 return {0: {'button_press_count': player.button_press_count, 'task_complete': True}}
 
