@@ -9,7 +9,7 @@
         <div class="welcome-text mb-5">
             <div class="instruction-section">
                 <h3>📝 Study Overview</h3>
-                <p>The Octagon is a study that consists of 8 sequential competitive mini-games.</p>
+                <p>The Octagon is a study that consists of 8 competitive mini-games.</p>
             </div>
 
             <div class="instruction-section">
@@ -37,14 +37,14 @@
                 <h3>💰 Payment</h3>
                 <p>You will receive <b>&pound;2</b> for entering the games, and additional pay based on your performance in the games.</p>
                 <p>At the end of the study, a performance ranking for each game will be published. In each game, if you score in the <b>top 10%</b> of participants you will receive an additional <b>£3</b>. This means that high performance in multiple games can significantly increase your earnings!</p>
-                <p>The exact amount. alongside your ranking will be communicated one week after the end of the games.</p>
+                <p>The exact amount. alongside your ranking will be communicated one week after you participate in the games.</p>
             </div>
 
             {% if show_quit_info %}
-                <div class="instruction-section">
+                <div class="instruction-section important-notice">
                     <h3>⚠️ Important Notice</h3>
                     <p>After completing the 4th game, you will have the option to end your participation early.</p>
-                    <p>You will receive performance based payment for any games you have achieved the top 10% until the game you decide to exit.</p>
+                    <p>You will receive performance-based payment for any games in which you have achieved the top 10%, <u>up to and including the game you decide to exit.</u></p>
                 </div>
             {% endif %}
 
@@ -95,6 +95,31 @@
     .start-button:hover {
         background-color: #2980b9;
         transform: scale(1.05);
+    }
+
+    /* INSERT HERE: Important Notice CSS */
+    .important-notice {
+        border: 3px solid #e63946;
+        background-color: #ffebee;
+        color: #b71c1c;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .important-notice h3 {
+        color: #b71c1c;
+        font-weight: bold;
+    }
+
+    .important-notice p {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .important-notice u {
+        text-decoration-color: #e63946;
+        text-decoration-thickness: 2px;
     }
 </style>
 {% endblock %}
