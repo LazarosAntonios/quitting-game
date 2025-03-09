@@ -21,10 +21,84 @@
 
 {% if show_quit_option %}
 <div class="quit-section mt-4">
-    <h4>⚠️ <strong> Important Notice </strong></h4>
-    <p>If you wish, you have the option to end your participation now. You will still receive payment for the rounds you have completed so far.</p>
-    <button id="quit-button" class="btn btn-warning">Quit Now</button>
+    <div class="quit-container">
+        <div class="quit-header">
+            <h4>⚠️ <span class="quit-title">IMPORTANT: EXIT OPTION AVAILABLE</span> ⚠️</h4>
+        </div>
+        <div class="quit-content">
+            <p>You now have the option to <strong>end your participation</strong> in this study.</p>
+            <p>If you choose to exit now:</p>
+            <ul>
+                <li>You will still receive payment for all rounds completed so far</li>
+                <li>You will be eligible for performance bonuses for all tasks you've already completed</li>
+                <li>You will not need to complete any remaining tasks</li>
+            </ul>
+            <div class="quit-action">
+                <button id="quit-button" class="btn btn-warning btn-lg">EXIT THE STUDY NOW</button>
+                <p class="continue-note">To continue with the study, simply click the "Next" button below</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .quit-container {
+        background-color: #fff8e1;
+        border: 3px solid #ff9800;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 30px 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .quit-header {
+        background-color: #ff9800;
+        margin: -20px -20px 15px -20px;
+        padding: 10px;
+        text-align: center;
+        border-radius: 7px 7px 0 0;
+    }
+
+    .quit-title {
+        color: white;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .quit-content {
+        padding: 0 10px;
+    }
+
+    .quit-content p, .quit-content ul {
+        font-size: 1.1em;
+    }
+
+    .quit-action {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px dashed #ff9800;
+    }
+
+    #quit-button {
+        font-size: 1.2em;
+        padding: 10px 25px;
+        background-color: #ff5722;
+        border-color: #ff5722;
+    }
+
+    #quit-button:hover {
+        background-color: #e64a19;
+        border-color: #e64a19;
+        transform: scale(1.05);
+    }
+
+    .continue-note {
+        margin-top: 15px;
+        font-style: italic;
+        color: #555;
+    }
+</style>
 {% endif %}
 
 <script>
