@@ -9,7 +9,7 @@ SESSION_CONFIGS = [
         informed_early=False,
         app_sequence=[
             'welcome',
-            #'colorsorting_task',
+            #'button_mashing',
             'demographics',
             'GridCount_task',
             'numbertype_task',
