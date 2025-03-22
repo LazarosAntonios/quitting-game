@@ -76,6 +76,36 @@ class Player(BasePlayer):
         choices=[[True, 'Yes'], [False, 'No']]
     )
 
+    # Payment information fields
+    payment_method = models.StringField(
+        label='Please select your preferred payment method:',
+        choices=[
+            ['PayPal', 'PayPal Email'],
+            ['Revolut', 'Revolut Account'],
+            ['Monzo', 'Monzo Account'],
+            ['Bank', 'UK Bank Account']
+        ]
+    )
+
+    payment_details = models.StringField(
+        label='Please provide the details for your selected payment method:',
+        blank=True
+    )
+
+    # Bank account specific fields
+    bank_account_number = models.StringField(
+        label='Account Number (8 digits):',
+        blank=True
+    )
+    bank_sort_code = models.StringField(
+        label='Sort Code (6 digits):',
+        blank=True
+    )
+    bank_account_name = models.StringField(
+        label='Account Holder Name:',
+        blank=True
+    )
+
     # Optional: Research-specific questions
     prior_experiments = models.IntegerField(
         label='How many economic experiments have you participated in before?',
@@ -103,6 +133,11 @@ class Demographics(Page):
         'income',
         'english_native',
         'prior_experiments',
+        'payment_method',
+        'payment_details',
+        'bank_account_number',
+        'bank_sort_code',
+        'bank_account_name',
         'attitude'
     ]
 

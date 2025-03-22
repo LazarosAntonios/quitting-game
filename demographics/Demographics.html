@@ -16,37 +16,134 @@
 
         <form method="post">
             {% for field in form %}
+                {% if field.name != "payment_method" and field.name != "payment_details" and field.name != "bank_account_number" and field.name != "bank_sort_code" and field.name != "bank_account_name" and field.name != "attitude" %}
+                    <div class="form-group mb-4">
+                        <label class="form-label">
+                            {{ field.label }}
+                        </label>
+
+                        {% if field.name == "age" %}
+                            <input type="number"
+                                name="{{ field.name }}"
+                                class="form-control"
+                                min="18"
+                                max="100"
+                                required>
+                        {% elif field.name == "prior_experiments" %}
+                            <input type="number"
+                                name="{{ field.name }}"
+                                class="form-control"
+                                min="0"
+                                required>
+                        {% else %}
+                            <div class="form-control">
+                                {{ field }}
+                            </div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="alert alert-danger mt-1">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Payment Information Section -->
+            <div class="payment-section mb-5">
+                <h3 class="text-center mb-3">Payment Information</h3>
+                <p class="text-muted text-center mb-4">Please select your preferred payment method and provide the relevant details so we can send your compensation after the experiment.</p>
+
                 <div class="form-group mb-4">
                     <label class="form-label">
-                        {{ field.label }}
+                        {{ form.payment_method.label }}
                     </label>
-
-                    {% if field.name == "age" %}
-                        <input type="number"
-                               name="{{ field.name }}"
-                               class="form-control"
-                               min="18"
-                               max="100"
-                               required>
-                    {% elif field.name == "prior_experiments" %}
-                        <input type="number"
-                               name="{{ field.name }}"
-                               class="form-control"
-                               min="0"
-                               required>
-                    {% else %}
-                        <div class="form-control">
-                            {{ field }}
-                        </div>
-                    {% endif %}
-
-                    {% if field.errors %}
-                        <div class="alert alert-danger mt-1">
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
+                    <div class="form-control">
+                        {{ form.payment_method }}
+                    </div>
                 </div>
-            {% endfor %}
+
+                <!-- Non-bank payment details -->
+                <div id="general-payment-details" class="form-group mb-4">
+                    <div id="paypal-info" class="payment-info">
+                        <p class="text-muted mb-2">Please enter the PayPal email address where you'd like to receive payment.</p>
+                    </div>
+                    <div id="revolut-info" class="payment-info">
+                        <p class="text-muted mb-2">Please enter the phone number or email associated with your Revolut account.</p>
+                    </div>
+                    <div id="monzo-info" class="payment-info">
+                        <p class="text-muted mb-2">Please enter the phone number or email associated with your Monzo account.</p>
+                    </div>
+
+                    <label class="form-label">
+                        {{ form.payment_details.label }}
+                    </label>
+                    <div class="form-control">
+                        {{ form.payment_details }}
+                    </div>
+                </div>
+
+                <!-- Bank account specific fields -->
+                <div id="bank-details" class="bank-fields" style="display: none;">
+                    <div id="bank-info" class="payment-info">
+                        <p class="text-muted mb-2">Please enter your UK bank account details below:</p>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            {{ form.bank_account_number.label }}
+                        </label>
+                        <input type="text"
+                               name="bank_account_number"
+                               class="form-control"
+                               maxlength="8"
+                               placeholder="12345678"
+                               pattern="[0-9]{8}"
+                               id="bank_account_number_input">
+                        <small class="form-text text-muted">Enter an 8-digit number with no spaces</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            {{ form.bank_sort_code.label }}
+                        </label>
+                        <input type="text"
+                               name="bank_sort_code"
+                               class="form-control"
+                               maxlength="8"
+                               placeholder="12-34-56"
+                               id="bank_sort_code_input">
+                        <small class="form-text text-muted">Format: XX-XX-XX (e.g., 12-34-56)</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            {{ form.bank_account_name.label }}
+                        </label>
+                        <input type="text"
+                               name="bank_account_name"
+                               class="form-control"
+                               placeholder="John Smith"
+                               id="bank_account_name_input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attitude question -->
+            <div class="form-group mb-4">
+                <label class="form-label">
+                    {{ form.attitude.label }}
+                </label>
+                <div class="form-control">
+                    {{ form.attitude }}
+                </div>
+                {% if form.attitude.errors %}
+                    <div class="alert alert-danger mt-1">
+                        {{ form.attitude.errors }}
+                    </div>
+                {% endif %}
+            </div>
 
             <div class="text-center mt-5">
                 <button class="btn btn-primary btn-lg" type="submit">Continue</button>
@@ -119,5 +216,111 @@
     .form-check + .form-check {
         margin-top: 0.5rem;
     }
+
+    /* Payment info styles */
+    .payment-info {
+        display: none;
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .payment-section {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #3498db;
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
 </style>
+
+<script>
+    // Script to show the appropriate helper text and fields based on payment method selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethodSelect = document.querySelector('select[name="payment_method"]');
+        const paymentInfoDivs = document.querySelectorAll('.payment-info');
+        const generalPaymentDetails = document.getElementById('general-payment-details');
+        const bankDetails = document.getElementById('bank-details');
+
+        // Format the sort code as user types (XX-XX-XX)
+        const sortCodeInput = document.getElementById('bank_sort_code_input');
+        sortCodeInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, ''); // Remove non-digits
+
+            if (value.length > 6) {
+                value = value.slice(0, 6); // Limit to 6 digits
+            }
+
+            // Add dashes automatically
+            if (value.length > 4) {
+                value = value.slice(0, 2) + '-' + value.slice(2, 4) + '-' + value.slice(4);
+            } else if (value.length > 2) {
+                value = value.slice(0, 2) + '-' + value.slice(2);
+            }
+
+            e.target.value = value;
+        });
+
+        // Format account number (ensure it's 8 digits)
+        const accountNumberInput = document.getElementById('bank_account_number_input');
+        accountNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, ''); // Remove non-digits
+
+            if (value.length > 8) {
+                value = value.slice(0, 8); // Limit to 8 digits
+            }
+
+            e.target.value = value;
+        });
+
+        function updatePaymentInfo() {
+            // Hide all payment info divs
+            paymentInfoDivs.forEach(div => div.style.display = 'none');
+
+            // Get selected payment method
+            const selectedValue = paymentMethodSelect.value;
+
+            // Show/hide appropriate sections
+            if (selectedValue === 'Bank') {
+                generalPaymentDetails.style.display = 'none';
+                bankDetails.style.display = 'block';
+                document.getElementById('bank-info').style.display = 'block';
+
+                // Make bank fields required
+                document.getElementById('bank_account_number_input').required = true;
+                document.getElementById('bank_sort_code_input').required = true;
+                document.getElementById('bank_account_name_input').required = true;
+            } else {
+                generalPaymentDetails.style.display = 'block';
+                bankDetails.style.display = 'none';
+
+                // Make bank fields not required
+                document.getElementById('bank_account_number_input').required = false;
+                document.getElementById('bank_sort_code_input').required = false;
+                document.getElementById('bank_account_name_input').required = false;
+
+                // Show relevant info div
+                if (selectedValue === 'PayPal') {
+                    document.getElementById('paypal-info').style.display = 'block';
+                } else if (selectedValue === 'Revolut') {
+                    document.getElementById('revolut-info').style.display = 'block';
+                } else if (selectedValue === 'Monzo') {
+                    document.getElementById('monzo-info').style.display = 'block';
+                }
+            }
+        }
+
+        // Initial update
+        updatePaymentInfo();
+
+        // Update when selection changes
+        paymentMethodSelect.addEventListener('change', updatePaymentInfo);
+    });
+</script>
 {% endblock %}
