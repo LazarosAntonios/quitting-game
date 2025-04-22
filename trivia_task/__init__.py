@@ -5,7 +5,7 @@ class Constants(BaseConstants):
     name_in_url = 'trivia_task'
     players_per_group = None
     num_rounds = 1
-    time_limit_seconds = 8 * 60  # 8 minutes
+    time_limit_seconds = 3 * 60  # 3 minutes
     questions = [
         {
             "question": "Which country has the longest coastline in the world?",
