@@ -24,12 +24,18 @@
                     <li>🎲 In case of ties (where multiple participants achieve the same score), rankings will be determined randomly among those tied</li>
                 </ul>
             </div>
+
+            <div class="alert alert-warning mt-3">
+                <h5>⚠️ Important Warning:</h5>
+                <p class="mb-0"><strong>Please do not switch tabs or leave this page during the challenge.</strong> Navigating away from this page may be flagged as an attempt to search for answers online, which could result in your participation being disqualified. Stay on this page until you've completed all questions.</p>
+            </div>
+
         </div>
 
         <div class="timer-container text-center mb-4">
             <div class="stat-box">
                 <span class="stat-label">Time Remaining:</span>
-                <span class="stat-value" id="timer">8:00</span>
+                <span class="stat-value" id="timer">3:00</span>
             </div>
         </div>
 
@@ -193,6 +199,6 @@
         }, 1000);
     }
 
-    startTimer(8 * 60);
+    startTimer(3 * 60);
 </script>
 {% endblock %}
