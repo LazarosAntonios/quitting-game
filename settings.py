@@ -89,8 +89,18 @@ USE_POINTS = True
 
 ROOMS = [
     dict(
-        name='Octagon',
-        display_name='The Octagon Games',
+        name='Octagon_Control',
+        display_name='The Octagon Games - C',
+        participant_label_file='_rooms/octagon.txt',
+    ),
+    dict(
+        name='Octagon_EarlyQuit',
+        display_name='The Octagon Games - EQ',
+        participant_label_file='_rooms/octagon.txt',
+    ),
+    dict(
+        name='Octagon_LateQuit',
+        display_name='The Octagon Games - LQ',
         participant_label_file='_rooms/octagon.txt',
     ),
     dict(name='live_demo', display_name='Room for live demo (no participant labels)'),
