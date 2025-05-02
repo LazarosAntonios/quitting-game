@@ -90,21 +90,18 @@ USE_POINTS = True
 ROOMS = [
     dict(
         name='Octagon_Control',
-        display_name='The Octagon Games - Control',
+        display_name='The Octagon Games - C',
         participant_label_file='_rooms/octagon.txt',
-        participant_label_prompt="Please enter your email address to begin the experiment:",
     ),
     dict(
         name='Octagon_EarlyQuit',
-        display_name='The Octagon Games - Early Quit',
+        display_name='The Octagon Games - EQ',
         participant_label_file='_rooms/octagon.txt',
-        participant_label_prompt="Please enter your email address to begin the experiment:",
     ),
     dict(
         name='Octagon_LateQuit',
-        display_name='The Octagon Games - Late Quit',
+        display_name='The Octagon Games - LQ',
         participant_label_file='_rooms/octagon.txt',
-        participant_label_prompt="Please enter your email address to begin the experiment:",
     ),
     dict(name='live_demo', display_name='Room for live demo (no participant labels)'),
 ]
