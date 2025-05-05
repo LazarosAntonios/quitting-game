@@ -13,6 +13,10 @@
             <div class="result-value">
                 {{ correct_count }} correct out of 100
             </div>
+            <!-- ADD THIS NEW DIV HERE -->
+            <div class="completion-time">
+                Completed in {{ completion_time }} seconds
+            </div>
         </div>
 
         <div class="mt-4">
@@ -46,6 +50,13 @@
         font-size: 3em;
         font-weight: bold;
         color: #2c3e50;
+    }
+
+    /* ADD THIS NEW CSS CLASS HERE */
+    .completion-time {
+        margin-top: 15px;
+        color: #666;
+        font-size: 1.1em;
     }
 </style>
 {% endblock %}

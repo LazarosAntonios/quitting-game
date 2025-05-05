@@ -22,9 +22,9 @@
                     <li>Your ranking will be determined by how many numbers you correctly order, counted sequentially from the largest number downward</li>
                     <li>The more numbers you correctly arrange compared to other participants, the higher your ranking</li>
                     <li>You have <strong>3 minutes</strong> to complete this task</li>
-                    <li>Separate each number with a comma</li>
-                    <li>Example format: 29,28,27,26,...</li>
-                    <li>🏆 Remember:: This is a competition! The top 10% of performers will receive an additional £0.50</li>
+                    <li>Separate each number with a comma and make sure to insert a <strong>SPACE</strong> after each comma.</li>
+                    <li>Example format: 29, 28, 27, 26,...</li>
+                    <li>🏆 Remember: This is a competition! The top 10% of performers will receive an additional £0.50</li>
                     <li>🎲 In case of ties (where multiple participants achieve the same score), rankings will be determined randomly among those tied</li>
                 </ul>
             </div>
@@ -57,6 +57,9 @@
                     required
                 ></textarea>
             </div>
+
+            <input type="hidden" name="completion_time" id="completionTime" value="0">
+
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary btn-lg">Submit Answer</button>
             </div>
@@ -157,6 +160,16 @@
 </style>
 
 <script>
+    /* ADD THESE LINES RIGHT HERE */
+    let startTime = Date.now();
+
+    // Add event listener to form submit
+    document.querySelector('form').addEventListener('submit', function() {
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+        document.getElementById('completionTime').value = timeSpent;
+    });
+
     function startTimer(duration) {
         let timer = duration;
         const display = document.getElementById('timer');

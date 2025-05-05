@@ -5,7 +5,7 @@ class Constants(BaseConstants):
     players_per_group = None
     num_rounds = 1
     time_limit_seconds = 3 * 60  # 3 minutes
-    numbers_to_sort = list(range(0, 100))  # Numbers from 0 to 29
+    numbers_to_sort = list(range(0, 100))  # Numbers from 0 to 100
 
 
 class Subsession(BaseSubsession):
@@ -19,12 +19,13 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     sorted_numbers = models.LongStringField()  # Stores the participant's input
     correct_count = models.IntegerField(initial=0)  # Number of correctly sorted numbers
+    completion_time = models.IntegerField(initial=0)  # Add this field
 
 
 class NumberTypingTask(Page):
     timeout_seconds = Constants.time_limit_seconds
     form_model = 'player'
-    form_fields = ['sorted_numbers']
+    form_fields = ['sorted_numbers', 'completion_time']
 
     def vars_for_template(self):
         import random
@@ -50,6 +51,7 @@ class Results(Page):
     def vars_for_template(self):
         return {
             'correct_count': self.correct_count,
+            'completion_time': self.completion_time,  # Add this line
         }
 
 
