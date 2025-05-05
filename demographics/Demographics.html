@@ -76,6 +76,10 @@
                         <p class="text-muted mb-2">Please enter the phone number or email associated with your Monzo account.</p>
                     </div>
 
+                    <div id="donate-info" class="payment-info">
+                        <p class="text-muted mb-2">Thank you for choosing to donate your payment. The amount will be donated to charitable causes.</p>
+                    </div>
+
                     <label class="form-label">
                         {{ form.payment_details.label }}
                     </label>
@@ -296,6 +300,18 @@
                 document.getElementById('bank_account_number_input').required = true;
                 document.getElementById('bank_sort_code_input').required = true;
                 document.getElementById('bank_account_name_input').required = true;
+            } else if (selectedValue === 'Donate') {
+                // Hide all payment detail fields for donation option
+                generalPaymentDetails.style.display = 'none';
+                bankDetails.style.display = 'none';
+
+                // Make all fields not required
+                document.getElementById('bank_account_number_input').required = false;
+                document.getElementById('bank_sort_code_input').required = false;
+                document.getElementById('bank_account_name_input').required = false;
+
+                // Add this line to show the donation info message
+                document.getElementById('donate-info').style.display = 'block';
             } else {
                 generalPaymentDetails.style.display = 'block';
                 bankDetails.style.display = 'none';

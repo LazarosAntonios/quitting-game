@@ -1,13 +1,3 @@
-{% extends "global/Page.html" %}
-{% block app_styles %}
-<style>
-    .otree-timer {
-        display: none;
-    }
-</style>
-{% endblock %}
-{% block title %}{% endblock %}
-
 {% block content %}
 <div class="card">
     <div class="card-body">
@@ -18,10 +8,10 @@
                 <h5>Instructions:</h5>
                 <ul class="mb-0">
                     <li><strong>The timer has already started!</strong></li>
+                    <li>You have <strong>3 minutes</strong> to complete this task</li>
                     <li>Arrange the numbers in <strong>descending order</strong> (highest to lowest)</li>
                     <li>Your ranking will be determined by how many numbers you correctly order, counted sequentially from the largest number downward</li>
                     <li>The more numbers you correctly arrange compared to other participants, the higher your ranking</li>
-                    <li>You have <strong>3 minutes</strong> to complete this task</li>
                     <li>Separate each number with a comma <strong>","</strong>.</li>
                     <li>Example format: 29, 28, 27, 26,...</li>
                     <li>🏆 Remember: This is a competition! The top 10% of performers will receive an additional £0.50</li>
@@ -51,11 +41,23 @@
             <div class="form-group">
                 <textarea
                     name="sorted_numbers"
+                    id="numbers-input"
                     class="form-control"
                     rows="4"
                     placeholder="Enter numbers separated by commas, e.g., 29,28,27,..."
                     required
                 ></textarea>
+            </div>
+
+            <!-- Counter Display -->
+            <div class="counter-display mt-3 p-3 bg-light rounded">
+                <div class="d-flex justify-content-between">
+                    <span>Numbers entered: <span id="entered-count" class="font-weight-bold">0</span>/100</span>
+                    <span>In correct position: <span id="correct-count" class="font-weight-bold text-success">0</span></span>
+                </div>
+                <div class="progress mt-2">
+                    <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                </div>
             </div>
 
             <input type="hidden" name="completion_time" id="completionTime" value="0">
@@ -157,18 +159,21 @@
         background-color: #2980b9;
         transform: scale(1.05);
     }
+
+    /* Counter display styles */
+    .counter-display {
+        background-color: #f8f9fa;
+        border-left: 4px solid #28a745;
+    }
+
+    .progress {
+        height: 10px;
+        border-radius: 5px;
+    }
 </style>
 
 <script>
-    /* ADD THESE LINES RIGHT HERE */
     let startTime = Date.now();
-
-    // Add event listener to form submit
-    document.querySelector('form').addEventListener('submit', function() {
-        const endTime = Date.now();
-        const timeSpent = Math.floor((endTime - startTime) / 1000);
-        document.getElementById('completionTime').value = timeSpent;
-    });
 
     function startTimer(duration) {
         let timer = duration;
@@ -187,7 +192,71 @@
         }, 1000);
     }
 
+    document.querySelector('form').addEventListener('submit', function() {
+        const endTime = Date.now();
+        const timeSpent = Math.floor((endTime - startTime) / 1000);
+        document.getElementById('completionTime').value = timeSpent;
+    });
+
     // Start timer when page loads
     startTimer({{ time_limit_seconds }});
+
+    // Live validation for the numbers input
+    const numbersInput = document.getElementById('numbers-input');
+    const enteredCountEl = document.getElementById('entered-count');
+    const correctCountEl = document.getElementById('correct-count');
+    const progressBar = document.getElementById('progress-bar');
+
+    // The expected correct order (descending from 99 to 0)
+    const correctOrder = Array.from({length: 100}, (_, i) => 99 - i);
+
+    function validateInput() {
+        const inputText = numbersInput.value.trim();
+
+        if (!inputText) {
+            enteredCountEl.textContent = "0";
+            correctCountEl.textContent = "0";
+            progressBar.style.width = "0%";
+            return;
+        }
+
+        // Split by commas and clean up each entry
+        const enteredNumbers = inputText.split(',').map(n => parseInt(n.trim()));
+
+        // Count valid numbers (filter out NaN)
+        const validNumbers = enteredNumbers.filter(n => !isNaN(n));
+        enteredCountEl.textContent = validNumbers.length;
+
+        // Count correct positions
+        let correctCount = 0;
+        for (let i = 0; i < Math.min(validNumbers.length, correctOrder.length); i++) {
+            if (validNumbers[i] === correctOrder[i]) {
+                correctCount++;
+            }
+        }
+
+        correctCountEl.textContent = correctCount;
+
+        // Update progress bar
+        const percentage = (validNumbers.length / 100) * 100;
+        progressBar.style.width = `${percentage}%`;
+
+        // Change color based on percentage of correct answers
+        const correctPercentage = (correctCount / validNumbers.length) * 100 || 0;
+        if (correctPercentage > 90) {
+            progressBar.className = "progress-bar bg-success";
+        } else if (correctPercentage > 50) {
+            progressBar.className = "progress-bar bg-warning";
+        } else {
+            progressBar.className = "progress-bar bg-danger";
+        }
+    }
+
+    // Add event listeners
+    numbersInput.addEventListener('input', validateInput);
+    numbersInput.addEventListener('paste', function() {
+        // Use setTimeout to allow the paste operation to complete
+        setTimeout(validateInput, 10);
+    });
 </script>
 {% endblock %}

@@ -83,7 +83,8 @@ class Player(BasePlayer):
             ['PayPal', 'PayPal Email'],
             ['Revolut', 'Revolut Account'],
             ['Monzo', 'Monzo Account'],
-            ['Bank', 'UK Bank Account']
+            ['Bank', 'UK Bank Account'],
+            ['Donate', 'I wish to not receive payment and donate the amount instead']
         ]
     )
 
@@ -140,6 +141,19 @@ class Demographics(Page):
         'bank_account_name',
         'attitude'
     ]
+
+    @staticmethod
+    def error_message(player, values):
+        # Make payment details required unless donating
+        if values['payment_method'] != 'Donate':
+            if values['payment_method'] == 'Bank':
+                # Bank account details are required
+                if not values['bank_account_number'] or not values['bank_sort_code'] or not values['bank_account_name']:
+                    return 'Please fill in all bank account details'
+            else:
+                # Other payment methods require payment_details
+                if not values['payment_details']:
+                    return 'Please provide your payment details'
 
 
 page_sequence = [Demographics]
