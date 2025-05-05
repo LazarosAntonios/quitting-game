@@ -37,13 +37,43 @@ class EncryptionTask(Page):
 
     @staticmethod
     def before_next_page(player, timeout_happened):
-        if player.answers:
-            answers = player.answers.split(',')
-            correct_count = sum(1 for ans, (_, solution) in
-                              zip(answers, [(w, encrypt_word(w)) for w in Constants.words])
-                              if ans.strip() == solution)
-            player.correct_count = correct_count
+        # Set completion time for timeout
+        if timeout_happened:
+            player.completion_time = Constants.timeout_seconds
 
+        # Print debugging information
+        print(f"Raw answers: '{player.answers}'")
+
+        if player.answers:
+            try:
+                answers = player.answers.split(',')
+                print(f"Split answers: {answers}")
+
+                # Debug each word's expected encryption
+                for i, word in enumerate(Constants.words):
+                    expected = encrypt_word(word)
+                    print(f"Word {i + 1}: {word} -> Expected: '{expected}'")
+
+                # Compare each answer with its expected solution
+                correct = 0
+                for i, word in enumerate(Constants.words):
+                    if i < len(answers):
+                        expected = encrypt_word(word)
+                        actual = answers[i].strip()
+                        is_match = actual == expected
+                        print(
+                            f"Comparing answer {i + 1}: Expected '{expected}' vs Actual '{actual}' -> Match: {is_match}")
+                        if is_match:
+                            correct += 1
+
+                print(f"Final correct count: {correct}")
+                player.correct_count = correct
+            except Exception as e:
+                print(f"Error in processing: {e}")
+                player.correct_count = 0
+        else:
+            print("No answers received")
+            player.correct_count = 0
 
 class Results(Page):
     @staticmethod

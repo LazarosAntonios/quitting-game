@@ -123,6 +123,10 @@ class ImageID(Page):
 
     @staticmethod
     def before_next_page(player, timeout_happened):
+        # Set completion time for timeout
+        if timeout_happened:
+            player.completion_time = Constants.timeout_seconds
+
         # ✅ If the player chose to quit, move them directly to "End"
         if player.participant.vars.get('quit', False):
             try:

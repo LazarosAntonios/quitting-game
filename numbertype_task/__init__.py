@@ -37,6 +37,9 @@ class NumberTypingTask(Page):
         }
 
     def before_next_page(self, **kwargs):  # Add **kwargs to handle timeout_happened
+        if kwargs.get('timeout_happened', False):
+            self.completion_time = Constants.time_limit_seconds
+
         try:
             participant_input = list(map(int, self.sorted_numbers.split(',')))  # Correct reference to `self.sorted_numbers`
             correct_order = sorted(Constants.numbers_to_sort, reverse=True)

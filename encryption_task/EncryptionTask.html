@@ -28,6 +28,12 @@
                     <li>🎲 In case of ties (where multiple participants achieve the same score), rankings will be determined randomly among those tied</li>
                 </ul>
             </div>
+
+            <div class="alert alert-warning mt-3">
+                <h5>⚠️ Important Warning:</h5>
+                <p class="mb-0"><strong>Please do not switch tabs or leave this page during the challenge.</strong> Navigating away from this page may be flagged as an attempt to search for answers online, which could result in your participation being disqualified. Stay on this page until you've completed all questions.</p>
+            </div>
+
         </div>
 
         <div class="timer text-center mb-4">
@@ -42,9 +48,8 @@
                        class="encryption-input"
                        placeholder="Enter encrypted number"
                        pattern="[0-9]*"
-                       maxlength="12"
-                       data-solution="{{ solution }}"
-                       required>
+                       maxlength="30"
+                       data-solution="{{ solution }}">
                 <div class="feedback"></div>
             </div>
             {% endfor %}
@@ -129,18 +134,38 @@
 
             display.textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 
+            // When 1 second left, preemptively collect answers
+            if (timer === 1) {
+                collectAndSetAnswers();
+                console.log("Pre-emptively collected answers:", document.getElementById('answers').value);
+            }
+
             if (--timer < 0) {
                 clearInterval(countdown);
+                // Do NOT try to collect answers here again
+                document.getElementById('completion_time').value = {{ timeout_seconds }};
                 document.querySelector("form").submit();
             }
         }, 1000);
     }
 
-    document.querySelector('form').addEventListener('submit', function(e) {
+    // Add this new function
+    function collectAndSetAnswers() {
         const inputs = document.querySelectorAll('.encryption-input');
-        const answers = Array.from(inputs).map(input => input.value).join(',');
-        document.getElementById('answers').value = answers;
+        const answersArray = [];
 
+        inputs.forEach(input => {
+            answersArray.push(input.value.trim());
+        });
+
+        const answersString = answersArray.join(',');
+        document.getElementById('answers').value = answersString;
+    }
+
+
+    // Update your form submit handler to use the same function
+    document.querySelector('form').addEventListener('submit', function(e) {
+        collectAndSetAnswers();
         const timeSpent = Math.floor((Date.now() - startTime) / 1000);
         document.getElementById('completion_time').value = timeSpent;
     });

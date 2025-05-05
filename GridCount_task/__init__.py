@@ -44,6 +44,10 @@ class GridCountTask(Page):
     def before_next_page(player: Player, timeout_happened):
         player.is_correct = player.count_answer == Constants.target_count
 
+        # If the timeout happened, ensure completion_time is set to the full duration
+        if timeout_happened:
+            player.completion_time = Constants.time_limit_seconds
+
 class Results(Page):
     @staticmethod
     def vars_for_template(player: Player):
