@@ -22,6 +22,7 @@ class Player(BasePlayer):
 class ColorSortingTask(Page):
     form_model = 'player'
     form_fields = ['sorted_colors', 'completion_time']
+    timeout_seconds = Constants.timeout_seconds  # Add this line
 
     @staticmethod
     def is_displayed(player):
@@ -29,6 +30,9 @@ class ColorSortingTask(Page):
 
     @staticmethod
     def before_next_page(player, timeout_happened):
+        if timeout_happened:
+            player.completion_time = Constants.timeout_seconds
+
         if player.participant.vars.get('quit', False):
             try:
                 end_index = player.session.config['app_sequence'].index('End')

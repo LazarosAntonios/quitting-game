@@ -1,4 +1,11 @@
 {% extends "global/Page.html" %}
+{% block app_styles %}
+<style>
+    .otree-timer {
+        display: none;
+    }
+</style>
+{% endblock %}
 {% block title %}{% endblock %}
 
 {% block content %}
@@ -10,11 +17,11 @@
             <div class="alert alert-info">
                 <h5>Instructions:</h5>
                 <ul class="mb-0">
+                    <li><strong>The timer has already started!</strong></li>
+                    <li>You have <strong>2 minutes</strong> to sort as many blocks as possible</li>
                     <li>Sort the patterns in blocks by dragging them into their matching pattern zones</li>
                     <li>Your objective is to correctly sort <strong>as many blocks as possible</strong></li>
-                    <li>Your ranking will be determined by the number of blocks you correctly sort</li>
                     <li>The more blocks you correctly sort compared to other participants, the higher your ranking</li>
-                    <li>You have <strong>2 minutes</strong> to sort as many blocks as possible</li>
                     <li>Each block placed in its correct zone counts as one point</li>
                     <li>You can submit your answers at any time using the button below</li>
                     <li>🏆 Remember: This is a competition! The top 10% of performers will receive an additional £0.50</li>
@@ -276,6 +283,14 @@ document.getElementById('sorting-form').addEventListener('submit', (e) => {
 
             if (--timeLeft < 0) {
                 clearInterval(timer);
+
+                // Make sure to update sorted colors before submitting
+                updateSortedColors();
+
+                // Set completion time to the full duration when timer expires
+                completionTimeInput.value = {{ timeout_seconds }};
+
+                // Force form submission
                 document.getElementById('sorting-form').submit();
             }
         }, 1000);
