@@ -32,6 +32,19 @@ class ColorSortingTask(Page):
     def before_next_page(player, timeout_happened):
         if timeout_happened:
             player.completion_time = Constants.timeout_seconds
+            print(f"Timeout happened, set completion_time to: {player.completion_time}")
+
+        # ✅ Fallback for missing/zero completion_time
+        if player.completion_time in [None, 0]:
+            import time
+            now = int(time.time())
+            start_time = player.participant.vars.get('task_start_time')
+            if start_time:
+                player.completion_time = now - start_time
+                print(f"Fallback: computed completion_time as {player.completion_time} seconds")
+            else:
+                player.completion_time = -1
+                print("Fallback failed: no start_time found, set completion_time to -1")
 
         if player.participant.vars.get('quit', False):
             try:
@@ -42,7 +55,7 @@ class ColorSortingTask(Page):
             player.participant.vars['finished'] = True
             raise StopIteration
 
-        # Add this block to count correct matches
+        # Count correct matches
         import json
         try:
             sorted_colors = json.loads(player.sorted_colors)
@@ -53,8 +66,11 @@ class ColorSortingTask(Page):
         except (json.JSONDecodeError, KeyError):
             player.correct_count = 0
 
-    def vars_for_template(self):
-        import random
+    @staticmethod
+    def vars_for_template(player):
+        import random, time
+        if 'task_start_time' not in player.participant.vars:
+            player.participant.vars['task_start_time'] = int(time.time())
         return {
             "shuffled_colors": random.sample(Constants.colors * 4, len(Constants.colors) * 4),
             "unique_colors": Constants.colors,

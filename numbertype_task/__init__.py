@@ -36,17 +36,47 @@ class NumberTypingTask(Page):
             'time_limit_seconds': Constants.time_limit_seconds,
         }
 
-    def before_next_page(self, **kwargs):  # Add **kwargs to handle timeout_happened
+    def before_next_page(self, **kwargs):  # Keep the **kwargs approach
+        # Handle timeout
         if kwargs.get('timeout_happened', False):
             self.completion_time = Constants.time_limit_seconds
 
+        # Process the sorted numbers with better error handling
         try:
-            participant_input = list(map(int, self.sorted_numbers.split(',')))  # Correct reference to `self.sorted_numbers`
+            # Clean up input: strip whitespace and handle potential trailing commas
+            cleaned_input = self.sorted_numbers.strip()
+            if cleaned_input.endswith(','):
+                cleaned_input = cleaned_input[:-1]
+
+            # Split by commas and clean each element
+            number_strings = [num.strip() for num in cleaned_input.split(',')]
+
+            # Convert to integers with careful handling
+            participant_input = []
+            for num_str in number_strings:
+                if num_str:  # Only process non-empty strings
+                    try:
+                        participant_input.append(int(num_str))
+                    except ValueError:
+                        # Skip invalid entries instead of failing completely
+                        pass
+
+            # Generate the correct order (descending from 99 to 0)
             correct_order = sorted(Constants.numbers_to_sort, reverse=True)
-            self.correct_count = sum(
-                1 for i, j in zip(participant_input, correct_order) if i == j
-            )
-        except ValueError:
+
+            # Count correct positions
+            correct_count = 0
+            for i, num in enumerate(participant_input):
+                if i < len(correct_order) and num == correct_order[i]:
+                    correct_count += 1
+
+            self.correct_count = correct_count
+
+            # Debug output
+            print(f"Processed {len(participant_input)} numbers, found {self.correct_count} correct")
+        except Exception as e:
+            print(f"Error processing numbers: {e}")
+            print(f"Raw input: {self.sorted_numbers}")
             self.correct_count = 0
 
 

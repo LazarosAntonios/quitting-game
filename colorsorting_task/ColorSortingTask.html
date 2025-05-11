@@ -17,7 +17,7 @@
             <div class="alert alert-info">
                 <h5>Instructions:</h5>
                 <ul class="mb-0">
-                    <li><strong>The timer has already started!</strong></li>
+                    <li>The timer starts <strong>AFTER</strong> your first move!</li>
                     <li>You have <strong>2 minutes</strong> to sort as many blocks as possible</li>
                     <li>Sort the patterns in blocks by dragging them into their matching pattern zones</li>
                     <li>Your objective is to correctly sort <strong>as many blocks as possible</strong></li>
@@ -196,9 +196,12 @@
 
 <script>
     let draggedBlock = null;
-    let timerStarted = false;
+    let timerStarted = true;  // ✅ Already started
     let timer;
-    const startTime = new Date().getTime();
+    let startTime = new Date().getTime();  // ✅ Immediately
+
+    startTimer({{ timeout_seconds }});  // ✅ Start countdown at page load
+
 
     const colorBlocks = document.querySelectorAll('.color-block');
     const sortingAreas = document.querySelectorAll('.sorting-area');
@@ -215,17 +218,14 @@
     colorBlocks.forEach(block => {
         block.addEventListener('dragstart', () => {
             draggedBlock = block;
-            // Start timer on first drag if not already started
-            if (!timerStarted) {
-                startTimer({{ timeout_seconds }});
-                timerStarted = true;
-            }
+            // Start timer on first drag
         });
 
         block.addEventListener('dragend', () => {
             draggedBlock = null;
         });
     });
+
 
     sortingAreas.forEach(area => {
         area.addEventListener('dragover', (e) => {
@@ -262,11 +262,53 @@
 
 // Update form submission to ensure colors are counted
 document.getElementById('sorting-form').addEventListener('submit', (e) => {
+    // Ensure the visual countdown timer is cleared if it's running
     if (timer) {
         clearInterval(timer);
     }
+
     const endTime = new Date().getTime();
-    completionTimeInput.value = Math.round((endTime - startTime) / 1000);
+    let timeSpent = 0;
+
+    if (startTime && endTime > startTime) {
+        timeSpent = Math.round((endTime - startTime) / 1000);
+        if (timeSpent === 0) timeSpent = 1;
+    }
+
+    // Check if startTime is valid (it should be, as it's set on page load)
+    // and if endTime is genuinely after startTime
+    if (typeof startTime === 'number' && typeof endTime === 'number' && endTime > startTime) {
+        timeSpent = Math.round((endTime - startTime) / 1000);
+
+        // If timeSpent rounds to 0, but actual time passed (endTime > startTime),
+        // set it to 1 second to reflect that some time was spent.
+        // This handles cases where duration is < 0.5 seconds.
+        if (timeSpent === 0 && endTime > startTime) {
+            timeSpent = 1;
+            console.log('Time spent was < 0.5s but > 0s, rounded up to 1s.');
+        }
+    } else if (typeof startTime === 'number' && typeof endTime === 'number' && endTime <= startTime) {
+        // This case (end time before or exactly at start time) is unusual for page interaction.
+        // Log it and keep timeSpent at 0 or handle as a specific case if needed.
+        console.warn('Warning: endTime is less than or equal to startTime. Completion time set to 0 seconds.');
+        timeSpent = 0;
+    } else {
+        // Handle cases where startTime or endTime might not be valid numbers (should not happen with new Date().getTime())
+        console.error('Error: startTime or endTime is not a valid number. Completion time set to 0 seconds.');
+        timeSpent = 0;
+    }
+
+    // Final check for NaN, though the above logic should prevent it.
+    if (isNaN(timeSpent)) {
+        console.error('Error: timeSpent calculated as NaN. Defaulting completion time to 0 seconds.');
+        timeSpent = 0;
+    }
+
+    console.log('Form submitted! Calculated timeSpent:', timeSpent, 'seconds');
+
+    // Explicitly set the value of the hidden input field
+    document.getElementById('completion_time').value = timeSpent;
+    console.log('Set hidden input completion_time to:', document.getElementById('completion_time').value);
 
     // Make sure to update sorted colors before submitting
     updateSortedColors();

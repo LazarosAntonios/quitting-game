@@ -47,6 +47,8 @@ class GridCountTask(Page):
         # If the timeout happened, ensure completion_time is set to the full duration
         if timeout_happened:
             player.completion_time = Constants.time_limit_seconds
+        # Consider partially correct answers as correct
+        player.is_correct = player.count_answer > 0
 
 class Results(Page):
     @staticmethod
