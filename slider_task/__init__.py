@@ -57,11 +57,16 @@ class Results(Page):
         return {
             'correct_sliders': player.correct_sliders,
             'total_sliders': Constants.num_sliders,
-            'target_value': Constants.target_value
+            'target_value': Constants.target_value,
+            'completion_time': player.completion_time  # Add this line
         }
 
     @staticmethod
     def before_next_page(player, timeout_happened):
+        # Add this line to handle timeout
+        if timeout_happened:
+            player.completion_time = Constants.timeout_seconds
+
         if player.participant.vars.get('quit', False):
             try:
                 end_index = player.session.config['app_sequence'].index('End')  # 🚀 Locate "End"

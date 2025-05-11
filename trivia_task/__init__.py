@@ -82,11 +82,12 @@ class Player(BasePlayer):
     answers_json = models.StringField(blank=True)
     answers = models.LongStringField(blank=True)
     correct_answers = models.IntegerField(initial=0)
+    completion_time = models.IntegerField(initial=0)
 
 
 class TriviaTask(Page):
     form_model = 'player'
-    form_fields = ['answers_json']
+    form_fields = ['answers_json', 'completion_time']
     timeout_seconds = Constants.time_limit_seconds
 
     @staticmethod
@@ -98,6 +99,9 @@ class TriviaTask(Page):
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
+        if timeout_happened:
+            player.completion_time = Constants.time_limit_seconds
+
         import json
         player.answers = player.answers_json
 
@@ -129,7 +133,8 @@ class TriviaResults(Page):
     def vars_for_template(player: Player):
         return {
             'correct_answers': player.correct_answers,
-            'total_questions': len(Constants.questions)
+            'total_questions': len(Constants.questions),
+            'completion_time': player.completion_time
         }
 
 
