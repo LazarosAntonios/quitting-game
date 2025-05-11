@@ -41,6 +41,10 @@ class SliderTask(Page):
 
     @staticmethod
     def before_next_page(player, timeout_happened):
+        # Add this line to handle timeout
+        if timeout_happened:
+            player.completion_time = Constants.timeout_seconds
+
         if player.participant.vars.get('quit', False):
             try:
                 end_index = player.session.config['app_sequence'].index('End')  # 🚀 Locate "End"

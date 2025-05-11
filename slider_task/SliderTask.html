@@ -244,6 +244,8 @@
 
             if (--timeLeft < 0) {
                 clearInterval(timer);
+                // Set the completion time to the full duration
+                document.getElementById('completion_time').value = {{ timeout_seconds }};
                 document.getElementById('form').submit();
             }
         }, 1000);
