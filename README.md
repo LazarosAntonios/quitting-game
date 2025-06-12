@@ -1,116 +1,87 @@
-quitting-game
+# Quitting Game
 
-A simple oTree experiment to study quitting behavior in sequential games.
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
+[![oTree](https://img.shields.io/badge/oTree-6.x-orange)](https://otree.readthedocs.io/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Table of Contents
+A web-based experiment built with oTree to study quitting decisions in sequential games.
 
-Overview
+---
 
-Features
+## 🚀 Quick Start
 
-Prerequisites
+1. **Clone the repo**
 
-Installation
+   ```bash
+   git clone https://github.com/LazarosAntonios/quitting-game.git
+   cd quitting-game
+   ```
+2. **Set up environment**
 
-Running the Experiment
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Linux/macOS
+   venv\Scripts\activate    # Windows
+   pip install -r requirements.txt
+   ```
+3. **Run the server**
 
-Project Structure
+   ```bash
+   otree devserver
+   ```
+4. **Open in browser**
+   Navigate to `http://localhost:8000`, select **quitting-game**, start session.
 
-Configuration
+---
 
-Contributing
+## 🔍 Features
 
-License
+* Configurable stages and payoffs
+* Clean UI with oTree pages
+* Data export in CSV format
+* Modular code for easy extension
 
-Overview
+---
 
-This repository contains an oTree project named quitting-game. Participants play a sequential decision task where they decide whether to continue or quit at each stage. The design allows analysis of risk-taking and quitting thresholds.
+## 📂 Project Structure
 
-Features
-
-Interactive web interface built with oTree
-
-Configurable number of stages and payoffs
-
-Data export in CSV for analysis
-
-Clean codebase following best practices (see codebase_experiment.md)
-
-Prerequisites
-
-Python 3.8 or higher
-
-oTree 6.x
-
-pip or venv for virtual environments
-
-Installation
-
-Clone the repo:
-
-git clone https://github.com/LazarosAntonios/quitting-game.git
-cd quitting-game
-
-Create a virtual environment and activate it:
-
-python -m venv venv
-source venv/bin/activate   # Linux/macOS
-venv\Scripts\activate    # Windows
-
-Install dependencies:
-
-pip install -r requirements.txt
-
-Running the Experiment
-
-Launch the oTree server:
-
-otree devserver
-
-Open your browser at http://localhost:8000.
-
-Select quitting-game and start a session.
-
-Project Structure
-
+```plain
 quitting-game/
-├── quitting_game/           # oTree app folder
+├── quitting_game/           # oTree app
 │   ├── __init__.py
-│   ├── models.py            # Game logic and variables
-│   ├── pages.py             # Page sequence and forms
-│   ├── templates/
-│   ├── static/
-│   └── codebase_experiment.md
-├── requirements.txt         # Python dependencies
-├── settings.py              # oTree configuration
-├── README.md                # This file
-└── LICENSE
+│   ├── models.py            # core game logic
+│   ├── pages.py             # page flow and forms
+│   ├── templates/           # HTML templates
+│   ├── static/              # CSS/JS assets
+│   └── codebase_experiment.md  # design notes
+├── requirements.txt         # dependencies
+├── settings.py              # oTree settings
+├── README.md                # project guide
+└── LICENSE                  # MIT license
+```
 
-Configuration
+---
 
-Edit settings.py to adjust:
+## ⚙️ Configuration
 
-Number of players
+Edit `settings.py` to adjust:
 
-Payoff parameters
+* Number of players
+* Payoff values
+* Session parameters
 
-Session settings
+---
 
-Contributing
+## 🤝 Contributing
 
-Contributions are welcome. To propose changes:
+1. Fork the repo
+2. Create a branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -m "Add feature"`
+4. Push branch: `git push origin feature-name`
+5. Open a pull request
 
-Fork the repository.
+---
 
-Create a feature branch (git checkout -b feature-name).
+## 📄 License
 
-Commit your changes (git commit -m "Add feature").
-
-Push to your branch (git push origin feature-name).
-
-Open a pull request.
-
-License
-
-This project is licensed under the MIT License. See LICENSE for details.
-
+This project uses the MIT License. See [LICENSE](LICENSE) for details.
